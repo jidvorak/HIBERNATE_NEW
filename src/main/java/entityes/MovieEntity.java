@@ -29,7 +29,7 @@ public class MovieEntity {
     @JoinColumn(name="director_id")
     DirectorEntity director;
 
-    @ManyToMany(mappedBy = "movies")
+    @ManyToMany(mappedBy = "movies") // nazev vlastnosti z ActorEntity (Set<MovieEntity> movies = new HashSet<>())
     private Set<ActorEntity> actors = new HashSet<>();
 
 }

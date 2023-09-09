@@ -25,7 +25,9 @@ public class ActorEntity {
     @Column(name="name")
     private String name;
 
+    // https://www.geeksforgeeks.org/hibernate-different-cascade-types/
     @ManyToMany(cascade = { CascadeType.DETACH })
+    // https://www.baeldung.com/hibernate-many-to-many
     @JoinTable(
             name = "a_movie_actor",
             joinColumns = { @JoinColumn(name = "id_actor") },

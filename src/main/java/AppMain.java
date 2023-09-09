@@ -4,6 +4,8 @@ import entityes.MovieEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.List;
+
 public class AppMain {
 
     public static void main(String[] args){
@@ -14,22 +16,10 @@ public class AppMain {
         Transaction transaction = session.beginTransaction();
 
         //selects2Tables(session);
+        //selectsMtoMtables(session);
+        basicHql(session);
 
-        ActorEntity actor = session.find(ActorEntity.class, 1);
-        System.out.println("Actor-> ac name=" + actor.getName());
-        if(actor.getMovies().size()>0){
-            actor.getMovies().forEach(movieEntity -> {
-                System.out.println("       - movie=" + movieEntity.getName());
-            });
-        }
 
-        MovieEntity movie = session.find(MovieEntity.class, 1);
-        System.out.println("Movie-> m name=" + movie.getName());
-        if(movie.getActors().size()>0){
-            movie.getActors().forEach(acEntity -> {
-                System.out.println("       - actor=" + acEntity.getName());
-            });
-        }
 
 
         boolean vseDopaloOK = true;
@@ -42,6 +32,45 @@ public class AppMain {
     }
 
     // *****************************************************************
+
+    private static void basicHql(Session session){
+
+        // HQL https://www.javatpoint.com/hql
+
+        // v HQL query je název java entity (MovieEntity)
+
+        //List<MovieEntity> movies = session.createQuery("from MovieEntity m").list();
+        //List<MovieEntity> movies = session.createQuery("from MovieEntity m where m.id>3").list();
+        List<MovieEntity> movies = session.createQuery("from MovieEntity m where m.id>3 ORDER by m.id DESC").list();
+
+        movies.forEach(movieEntity -> {
+            System.out.println("film=" + movieEntity.getName() + " id=" + movieEntity.getId());
+            if(movieEntity.getActors().size()>0){
+                movieEntity.getActors().forEach(acEntity -> {
+                    System.out.println("       - actor=" + acEntity.getName());
+                });
+            }
+        });
+    }
+    private static void selectsMtoMtables(Session session){
+        ActorEntity actor = session.find(ActorEntity.class, 1);
+        System.out.println("Actor-> ac name=" + actor.getName());
+
+        if(actor.getMovies().size()>0){
+            actor.getMovies().forEach(movieEntity -> {
+                System.out.println("       - movie=" + movieEntity.getName());
+            });
+        }
+
+        MovieEntity movie = session.find(MovieEntity.class, 1);
+        System.out.println("Movie-> m name=" + movie.getName());
+
+        if(movie.getActors().size()>0){
+            movie.getActors().forEach(acEntity -> {
+                System.out.println("       - actor=" + acEntity.getName());
+            });
+        }
+    }
 
     private static void selects2Tables(Session session){
         MovieEntity movie = session.find(MovieEntity.class, 1);
