@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="a_movie")
@@ -26,7 +23,8 @@ public class MovieEntity {
     @Column(name="name")
     private String name;
 
-    @Column(name="director_id")
-    private Integer directorId;
+    @OneToOne
+    @JoinColumn(name="director_id")
+    DirectorEntity director;
 
 }

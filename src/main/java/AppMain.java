@@ -12,11 +12,8 @@ public class AppMain {
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
 
-        MovieEntity movie = session.find(MovieEntity.class, 1);
-        System.out.println("FILM-> " + movie.getId() + " - " + movie.getName() + " - " + movie.getDirectorId());
+        selects2Tables(session);
 
-        DirectorEntity director = session.find(DirectorEntity.class, 2);
-        System.out.println("REJZA-> " + director.getId() + " - " + director.getName());
 
         boolean vseDopaloOK = true;
         if(vseDopaloOK)
@@ -26,4 +23,25 @@ public class AppMain {
 
         session.close();
     }
+
+    // *****************************************************************
+
+    private static void selects2Tables(Session session){
+        MovieEntity movie = session.find(MovieEntity.class, 1);
+        System.out.println("----------------------------------");
+        System.out.println("FILM-> idfilmu=" + movie.getId() + ";  jmenofilmu=" + movie.getName() + "; directorname=" + movie.getDirector().getName());
+        System.out.println("----------------------------------");
+
+
+        DirectorEntity director = session.find(DirectorEntity.class, 2);
+        System.out.println("REJZA-> id=" + director.getId() + "; jmeno=" + director.getName());
+
+        if(director.getMovies()!=null && director.getMovies().size()>0){
+            director.getMovies().forEach(movieEntity -> {
+                System.out.println("           - film=" + movieEntity.getName() );
+            });
+        }
+    }
+
+
 }
