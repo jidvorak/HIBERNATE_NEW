@@ -23,6 +23,14 @@ public class AppMain {
             });
         }
 
+        MovieEntity movie = session.find(MovieEntity.class, 1);
+        System.out.println("Movie-> m name=" + movie.getName());
+        if(movie.getActors().size()>0){
+            movie.getActors().forEach(acEntity -> {
+                System.out.println("       - actor=" + acEntity.getName());
+            });
+        }
+
 
         boolean vseDopaloOK = true;
         if(vseDopaloOK)
