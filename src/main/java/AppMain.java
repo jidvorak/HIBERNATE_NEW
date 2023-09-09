@@ -15,7 +15,7 @@ public class AppMain {
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
 
-        //selects2Tables(session);
+        //selects2Tables(session);   //bbbbb
         //selectsMtoMtables(session);
         basicHql(session);
 
