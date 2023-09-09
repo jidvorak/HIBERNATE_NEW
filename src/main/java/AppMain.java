@@ -1,3 +1,4 @@
+import entityes.ActorEntity;
 import entityes.DirectorEntity;
 import entityes.MovieEntity;
 import org.hibernate.Session;
@@ -12,7 +13,15 @@ public class AppMain {
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
 
-        selects2Tables(session);
+        //selects2Tables(session);
+
+        ActorEntity actor = session.find(ActorEntity.class, 1);
+        System.out.println("Actor-> ac name=" + actor.getName());
+        if(actor.getMovies().size()>0){
+            actor.getMovies().forEach(movieEntity -> {
+                System.out.println("       - movie=" + movieEntity.getName());
+            });
+        }
 
 
         boolean vseDopaloOK = true;

@@ -1,3 +1,4 @@
+import entityes.ActorEntity;
 import entityes.DirectorEntity;
 import entityes.MovieEntity;
 import org.hibernate.Session;
@@ -11,6 +12,7 @@ public class DbConnect {
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(MovieEntity.class)
                 .addAnnotatedClass(DirectorEntity.class)
+                .addAnnotatedClass(ActorEntity.class)
                 .buildSessionFactory();
         Session session = sessionFactory.openSession();
         return session;

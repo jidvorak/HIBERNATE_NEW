@@ -10,26 +10,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="a_movie")
+@Table(name="a_actor")
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MovieEntity {
+public class ActorEntity {
 
     @Id
-    @Column(name="id_movie")
+    @Column(name="id_actor")
     private Integer id;
 
     @Column(name="name")
     private String name;
 
-    @OneToOne
-    @JoinColumn(name="director_id")
-    DirectorEntity director;
-
-    @ManyToMany(mappedBy = "movies")
-    private Set<ActorEntity> actors = new HashSet<>();
+    @ManyToMany(cascade = { CascadeType.DETACH })
+    @JoinTable(
+            name = "a_movie_actor",
+            joinColumns = { @JoinColumn(name = "id_actor") },
+            inverseJoinColumns = { @JoinColumn(name = "id_movie") })
+    Set<MovieEntity> movies = new HashSet<>();
 
 }
