@@ -1,5 +1,6 @@
-package entityes;
+package dedicnost;
 
+import entityes.MovieEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,23 +10,16 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name="a_director")
-
+@Table(name="entita01")
+// dedi sloupec id z ParentEntity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DirectorEntity {
-
-    @Id
-    @Column(name="director_id")
-    private Integer id;
+public class Entita01 extends ParentEntity{
 
     @Column(name="name")
     private String name;
 
-    @OneToMany
-    @JoinColumn(name="director_id")
-    List<MovieEntity> movies;
 
 }

@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="a_movie")
@@ -26,7 +25,11 @@ public class MovieEntity {
     @Column(name="name")
     private String name;
 
-    @Column(name="director_id")
-    private Integer directorId;
+    @OneToOne
+    @JoinColumn(name="director_id")
+    DirectorEntity director;
+
+    @ManyToMany(mappedBy = "movies") // nazev vlastnosti z ActorEntity (Set<MovieEntity> movies = new HashSet<>())
+    private Set<ActorEntity> actors = new HashSet<>();
 
 }
