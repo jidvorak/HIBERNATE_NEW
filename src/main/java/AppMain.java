@@ -19,9 +19,6 @@ public class AppMain {
         //selectsMtoMtables(session);
         basicHql(session);
 
-
-
-
         boolean vseDopaloOK = true;
         if(vseDopaloOK)
             transaction.commit();
@@ -32,7 +29,6 @@ public class AppMain {
     }
 
     // *****************************************************************
-
     private static void basicHql(Session session){
 
         // HQL https://www.javatpoint.com/hql
