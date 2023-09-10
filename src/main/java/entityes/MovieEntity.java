@@ -20,6 +20,7 @@ public class MovieEntity {
 
     @Id
     @Column(name="id_movie")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name="name")

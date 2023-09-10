@@ -20,10 +20,15 @@ public class ActorEntity {
 
     @Id
     @Column(name="id_actor")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name="name")
     private String name;
+
+    @Column(name="age")
+    private Integer age;
+
 
     // https://www.geeksforgeeks.org/hibernate-different-cascade-types/
     @ManyToMany(cascade = { CascadeType.DETACH })

@@ -19,6 +19,7 @@ public class DirectorEntity {
 
     @Id
     @Column(name="director_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name="name")
