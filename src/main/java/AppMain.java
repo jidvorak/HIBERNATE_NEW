@@ -58,6 +58,13 @@ public class AppMain {
         newActor.setAge(22);
         newActor.getMovies().add(newMovie);
         session.persist(newActor);
+        /*
+        // test select
+        USE mydb;
+        SELECT m.id_movie, m.name, a.id_actor, a.name, a.age
+        FROM mydb.a_actor a, mydb.a_movie m, a_movie_actor ma
+        where m.id_movie = ma.id_movie and ma.id_actor = a.id_actor and m.id_movie=6;
+        * */
     }
 
     // zalozime novy film
