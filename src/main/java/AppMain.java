@@ -26,6 +26,7 @@ public class AppMain {
         // updateList(session);
 
 
+        addMovieAndItsActors(session);
         transaction.commit();
 
         /*
@@ -44,11 +45,19 @@ public class AppMain {
     // doporucujií modifikovat entitu (pridavat do ni) která má anotaci @JoinTable
     private static void addMovieAndItsActors(Session session){
         MovieEntity newMovie = insertNewMovie(session, "Film - Herci nad 30", 1); // funkce vytvozi v db novy film
+        System.out.println("ID NOVEHO FILMU=" + newMovie.getId());
         List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber hescu starcich 30 let
         olderActors.forEach(actorEntity -> { // loop prez vybrane herce
             actorEntity.getMovies().add(newMovie); // kazdemu herci přidame vytvořeny film
             session.persist(actorEntity); // ulozime herce do db
         });
+
+        // vytvorime noveho uzivatele a pridame mu take novy film
+        ActorEntity newActor = new ActorEntity();
+        newActor.setName("Novy herec pod 30 let");
+        newActor.setAge(22);
+        newActor.getMovies().add(newMovie);
+        session.persist(newActor);
     }
 
     // zalozime novy film
