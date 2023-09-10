@@ -21,8 +21,11 @@ public class AppMain {
         //updateSimple(session);
         //updateList(session)
 
+        Integer newMovieId = insertNewMovie(session, "Duna", 1);
+        System.out.println("MOVIE ID = " + newMovieId);
 
         transaction.commit();
+
 
         /*
         boolean vseDopaloOK = true;
@@ -35,6 +38,22 @@ public class AppMain {
     }
 
     // *****************************************************************
+
+    private static Integer insertNewMovie(Session session, String moviename, Integer dirId){
+        DirectorEntity directorEntity = session.find(DirectorEntity.class, dirId);
+        MovieEntity movieEntity = new MovieEntity();
+        movieEntity.setName(moviename);
+        movieEntity.setDirector(directorEntity);
+        MovieEntity savedMovie = (MovieEntity) session.merge(movieEntity);
+        return savedMovie.getId();
+    }
+
+    private static void updateMovieDirector(Session session, Integer movieId, Integer dirId){
+        MovieEntity movie = session.find(MovieEntity.class, movieId);
+        DirectorEntity director = session.find(DirectorEntity.class, dirId);
+        movie.setDirector(director);
+        session.persist(movie);
+    }
 
     private static void updateList(Session session){
         List<MovieEntity> movies = session.createQuery("from MovieEntity m").list();
@@ -94,6 +113,14 @@ public class AppMain {
                 System.out.println("       - actor=" + acEntity.getName());
             });
         }
+    }
+
+
+    private static void printMovieAndDirector(Session session, Integer idMovie) {
+        MovieEntity movie = session.find(MovieEntity.class, idMovie);
+        System.out.println("----------------------------------");
+        System.out.println("movieID=" + movie.getId() + "; movieNAME=" + movie.getName() + " directorID=" + movie.getDirector().getId() + " ; directorNAME=" + movie.getDirector().getName());
+        System.out.println("----------------------------------");
     }
 
     private static void selects2Tables(Session session){

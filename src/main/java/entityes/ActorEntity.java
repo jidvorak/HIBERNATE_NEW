@@ -20,6 +20,7 @@ public class ActorEntity {
 
     @Id
     @Column(name="id_actor")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name="name")
