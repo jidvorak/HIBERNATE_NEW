@@ -18,7 +18,7 @@ public class AppMain {
 
         //selects2Tables(session);
         //selectsMtoMtables(session);
-        //basicHql(session);
+        basicHql(session);
         List<TestEntity> testEntities = session.createQuery("from TestEntity").list();
         testEntities.forEach(testEntity -> {
             System.out.println(testEntity.getTestcol1());
