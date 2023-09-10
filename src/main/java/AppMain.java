@@ -4,6 +4,7 @@ import entityes.MovieEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ public class AppMain {
 
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
+
+        EntityManager entityManager = session;
 
         // selects2Tables(session);
         // selectsMtoMtables(session);
