@@ -10,6 +10,9 @@ public class AppMain {
 
     public static void main(String[] args){
 
+        // nova verze
+
+
         System.out.println("Hibernate test");
 
         Session session = DbConnect.getSession();
