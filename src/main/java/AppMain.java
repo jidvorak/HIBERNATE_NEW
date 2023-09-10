@@ -24,9 +24,23 @@ public class AppMain {
         // basicHql(session);
         // updateSimple(session);
         // updateList(session);
+        // addMovieAndItsActors(session);
+
+        // doresit
+        /*List<ActorEntity> olderActors = session.createQuery("from ActorEntity where movies.id=6").list(); // vyber hescu starcich 30 let
+        olderActors.forEach(ac -> { //
+            System.out.println("ac name=" + ac.getName() + " ac id=" + ac.getId());
+        });*/
+
+        /*
+        ActorEntity ac = new ActorEntity();
+        ac.setName("to delete");
+        ac.setAge(44);
+        ActorEntity acPersisted = (ActorEntity) session.merge(ac);
+        //acPersisted.getId();*/
 
 
-        addMovieAndItsActors(session);
+
         transaction.commit();
 
         /*
@@ -40,6 +54,14 @@ public class AppMain {
     }
 
     // *****************************************************************
+
+    // nejjednoduzsi mazani
+    private static void simpleDelete(Session session){
+        // vyber entity herec z db s id 10
+        ActorEntity ac = session.find(ActorEntity.class, 10);
+        if(ac!=null) // pokud existuje v db
+            session.remove(ac); // mazeme zazbnam dle entity
+    }
 
     // Přidání filmu a svázání s herci vazbou m..n
     // doporucujií modifikovat entitu (pridavat do ni) která má anotaci @JoinTable
