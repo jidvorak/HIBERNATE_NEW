@@ -4,6 +4,7 @@ import entityes.MovieEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Set;
 
@@ -19,11 +20,28 @@ public class AppMain {
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
 
+        EntityManager entityManager = session;
+
         // selects2Tables(session);
         // selectsMtoMtables(session);
         // basicHql(session);
         // updateSimple(session);
         // updateList(session);
+        // addMovieAndItsActors(session);
+
+        // doresit
+        /*List<ActorEntity> olderActors = session.createQuery("from ActorEntity where movies.id=6").list(); // vyber hescu starcich 30 let
+        olderActors.forEach(ac -> { //
+            System.out.println("ac name=" + ac.getName() + " ac id=" + ac.getId());
+        });*/
+
+        /*
+        ActorEntity ac = new ActorEntity();
+        ac.setName("to delete");
+        ac.setAge(44);
+        ActorEntity acPersisted = (ActorEntity) session.merge(ac);
+        //acPersisted.getId();*/
+
 
 
         transaction.commit();
@@ -40,15 +58,38 @@ public class AppMain {
 
     // *****************************************************************
 
+    // nejjednoduzsi mazani
+    private static void simpleDelete(Session session){
+        // vyber entity herec z db s id 10
+        ActorEntity ac = session.find(ActorEntity.class, 10);
+        if(ac!=null) // pokud existuje v db
+            session.remove(ac); // mazeme zazbnam dle entity
+    }
+
     // Přidání filmu a svázání s herci vazbou m..n
     // doporucujií modifikovat entitu (pridavat do ni) která má anotaci @JoinTable
     private static void addMovieAndItsActors(Session session){
         MovieEntity newMovie = insertNewMovie(session, "Film - Herci nad 30", 1); // funkce vytvozi v db novy film
+        System.out.println("ID NOVEHO FILMU=" + newMovie.getId());
         List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber hescu starcich 30 let
         olderActors.forEach(actorEntity -> { // loop prez vybrane herce
             actorEntity.getMovies().add(newMovie); // kazdemu herci přidame vytvořeny film
             session.persist(actorEntity); // ulozime herce do db
         });
+
+        // vytvorime noveho uzivatele a pridame mu take novy film
+        ActorEntity newActor = new ActorEntity();
+        newActor.setName("Novy herec pod 30 let");
+        newActor.setAge(22);
+        newActor.getMovies().add(newMovie);
+        session.persist(newActor);
+        /*
+        // test select
+        USE mydb;
+        SELECT m.id_movie, m.name, a.id_actor, a.name, a.age
+        FROM mydb.a_actor a, mydb.a_movie m, a_movie_actor ma
+        where m.id_movie = ma.id_movie and ma.id_actor = a.id_actor and m.id_movie=6;
+        * */
     }
 
     // zalozime novy film
