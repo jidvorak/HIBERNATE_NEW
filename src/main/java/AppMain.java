@@ -39,41 +39,44 @@ public class AppMain {
 
     // *****************************************************************
 
+    // zalozime novy film
     private static Integer insertNewMovie(Session session, String moviename, Integer dirId){
-        DirectorEntity directorEntity = session.find(DirectorEntity.class, dirId);
-        MovieEntity movieEntity = new MovieEntity();
-        movieEntity.setName(moviename);
-        movieEntity.setDirector(directorEntity);
-        MovieEntity savedMovie = (MovieEntity) session.merge(movieEntity);
-        return savedMovie.getId();
+        DirectorEntity directorEntity = session.find(DirectorEntity.class, dirId); // nacteni rezizera d DB
+        MovieEntity movieEntity = new MovieEntity(); // vytvoreni entity  film
+        movieEntity.setName(moviename); // nastaveni jmena filmu
+        movieEntity.setDirector(directorEntity); // nastaveni rezizera pro film
+        MovieEntity savedMovie = (MovieEntity) session.merge(movieEntity); // ulozeni do db a vraceni ulozeneho filmu
+        // metoda persisit take uklada jako merge, ale ta nevraci nove ulozenou entitu
+        return savedMovie.getId(); // vratime ulozene id filmu
     }
 
+    // zmena rezisera filmu
     private static void updateMovieDirector(Session session, Integer movieId, Integer dirId){
-        MovieEntity movie = session.find(MovieEntity.class, movieId);
-        DirectorEntity director = session.find(DirectorEntity.class, dirId);
-        movie.setDirector(director);
-        session.persist(movie);
+        MovieEntity movie = session.find(MovieEntity.class, movieId); // nacteni filmu z db
+        DirectorEntity director = session.find(DirectorEntity.class, dirId); // nasteni rezisera z db
+        movie.setDirector(director); // nastaveni rezisera pro film
+        session.persist(movie); // ulozeni filmu do db
     }
 
+    // projde vice zaznamu a vsechny updatuje
     private static void updateList(Session session){
-        List<MovieEntity> movies = session.createQuery("from MovieEntity m").list();
-        movies.forEach(movieEntity -> {
-            movieEntity.setName(movieEntity.getName() + " - m");
-            session.persist(movieEntity);
+        List<MovieEntity> movies = session.createQuery("from MovieEntity m").list(); // ncti list filmu
+        movies.forEach(movieEntity -> { // smycka prez vsechny nactene entity
+            movieEntity.setName(movieEntity.getName() + " - m"); // nastav entite film jmeno
+            session.persist(movieEntity); // uloz do db
         });
     }
+    // jednoducha zmena jmena dvou reziseru
     private static void updateSimple(Session session){
+        DirectorEntity director = session.find(DirectorEntity.class, 1); // nacteni z db
+        DirectorEntity director2 = session.find(DirectorEntity.class, 2); // nacteni z db
 
-        DirectorEntity director = session.find(DirectorEntity.class, 1);
-        DirectorEntity director2 = session.find(DirectorEntity.class, 2);
+        director.setName("Miloš Forman"); // zmena jmena
+        director2.setName("Francis Ford Copola"); // zmena jmena
 
-        director.setName("Miloš Forman");
-        director2.setName("Francis Ford Copola");
+        session.persist(director); // ulozeni do db
+        session.persist(director2); // ulozeni do db
 
-        session.persist(director);
-        session.persist(director2);
-
-        System.out.println("----------ulozeno---------");
     }
 
     private static void basicHql(Session session){
