@@ -15,14 +15,14 @@ public class AppMain {
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
 
-        //selects2Tables(session);
-        //selectsMtoMtables(session);
-        //basicHql(session);
-        //updateSimple(session);
-        //updateList(session)
+        // selects2Tables(session);
+        // selectsMtoMtables(session);
+        // basicHql(session);
+        // updateSimple(session);
+        // updateList(session);
 
-        //Integer newMovieId = insertNewMovie(session, "Duna", 1);
-        //System.out.println("MOVIE ID = " + newMovieId);
+        Integer newMovieId = insertNewMovie(session, "Duna", 1);
+        System.out.println("MOVIE ID = " + newMovieId);
 
         ActorEntity actor = session.find(ActorEntity.class, 4);
         actor.setAge(75);
