@@ -17,18 +17,46 @@ public class AppMain {
 
         //selects2Tables(session);
         //selectsMtoMtables(session);
-        basicHql(session);
+        //basicHql(session);
+        //updateSimple(session);
+        //updateList(session)
 
+
+        transaction.commit();
+
+        /*
         boolean vseDopaloOK = true;
         if(vseDopaloOK)
             transaction.commit();
         else
             transaction.rollback();
-
+        */
         session.close();
     }
 
     // *****************************************************************
+
+    private static void updateList(Session session){
+        List<MovieEntity> movies = session.createQuery("from MovieEntity m").list();
+        movies.forEach(movieEntity -> {
+            movieEntity.setName(movieEntity.getName() + " - m");
+            session.persist(movieEntity);
+        });
+    }
+    private static void updateSimple(Session session){
+
+        DirectorEntity director = session.find(DirectorEntity.class, 1);
+        DirectorEntity director2 = session.find(DirectorEntity.class, 2);
+
+        director.setName("Miloš Forman");
+        director2.setName("Francis Ford Copola");
+
+        session.persist(director);
+        session.persist(director2);
+
+        System.out.println("----------ulozeno---------");
+    }
+
     private static void basicHql(Session session){
 
         // HQL https://www.javatpoint.com/hql
