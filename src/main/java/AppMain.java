@@ -5,10 +5,14 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
+import java.util.Set;
 
 public class AppMain {
 
     public static void main(String[] args){
+
+        // nova verze
+
 
         System.out.println("Hibernate test");
 
@@ -21,15 +25,8 @@ public class AppMain {
         // updateSimple(session);
         // updateList(session);
 
-        Integer newMovieId = insertNewMovie(session, "Duna", 1);
-        System.out.println("MOVIE ID = " + newMovieId);
-
-        ActorEntity actor = session.find(ActorEntity.class, 4);
-        actor.setAge(75);
-        session.persist(actor);
 
         transaction.commit();
-
 
         /*
         boolean vseDopaloOK = true;
@@ -43,15 +40,26 @@ public class AppMain {
 
     // *****************************************************************
 
+    // Přidání filmu a svázání s herci vazbou m..n
+    // doporucujií modifikovat entitu (pridavat do ni) která má anotaci @JoinTable
+    private static void addMovieAndItsActors(Session session){
+        MovieEntity newMovie = insertNewMovie(session, "Film - Herci nad 30", 1); // funkce vytvozi v db novy film
+        List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber hescu starcich 30 let
+        olderActors.forEach(actorEntity -> { // loop prez vybrane herce
+            actorEntity.getMovies().add(newMovie); // kazdemu herci přidame vytvořeny film
+            session.persist(actorEntity); // ulozime herce do db
+        });
+    }
+
     // zalozime novy film
-    private static Integer insertNewMovie(Session session, String moviename, Integer dirId){
+    private static MovieEntity insertNewMovie(Session session, String moviename, Integer dirId){
         DirectorEntity directorEntity = session.find(DirectorEntity.class, dirId); // nacteni rezizera d DB
         MovieEntity movieEntity = new MovieEntity(); // vytvoreni entity  film
         movieEntity.setName(moviename); // nastaveni jmena filmu
         movieEntity.setDirector(directorEntity); // nastaveni rezizera pro film
         MovieEntity savedMovie = (MovieEntity) session.merge(movieEntity); // ulozeni do db a vraceni ulozeneho filmu
         // metoda persisit take uklada jako merge, ale ta nevraci nove ulozenou entitu
-        return savedMovie.getId(); // vratime ulozene id filmu
+        return savedMovie; // vratime ulozene id filmu
     }
 
     // zmena rezisera filmu
