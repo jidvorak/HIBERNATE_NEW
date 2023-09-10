@@ -26,6 +26,10 @@ public class ActorEntity {
     @Column(name="name")
     private String name;
 
+    @Column(name="age")
+    private Integer age;
+
+
     // https://www.geeksforgeeks.org/hibernate-different-cascade-types/
     @ManyToMany(cascade = { CascadeType.DETACH })
     // https://www.baeldung.com/hibernate-many-to-many

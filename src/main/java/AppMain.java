@@ -21,8 +21,12 @@ public class AppMain {
         //updateSimple(session);
         //updateList(session)
 
-        Integer newMovieId = insertNewMovie(session, "Duna", 1);
-        System.out.println("MOVIE ID = " + newMovieId);
+        //Integer newMovieId = insertNewMovie(session, "Duna", 1);
+        //System.out.println("MOVIE ID = " + newMovieId);
+
+        ActorEntity actor = session.find(ActorEntity.class, 4);
+        actor.setAge(75);
+        session.persist(actor);
 
         transaction.commit();
 
