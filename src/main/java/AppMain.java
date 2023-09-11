@@ -20,7 +20,7 @@ public class AppMain {
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
 
-        EntityManager entityManager = session;
+        //EntityManager entityManager = session;
 
         // selects2Tables(session);
         // selectsMtoMtables(session);
@@ -28,6 +28,7 @@ public class AppMain {
         // updateSimple(session);
         // updateList(session);
         // addMovieAndItsActors(session);
+        //simpleDelete(session);
 
         // doresit
         /*List<ActorEntity> olderActors = session.createQuery("from ActorEntity where movies.id=6").list(); // vyber hescu starcich 30 let
