@@ -22,9 +22,9 @@ public class AppMain {
 
         EntityManager entityManager = session;
 
-        // selects2Tables(session);
-        // selectsMtoMtables(session);
-        // basicHql(session);
+        selects2Tables(session);
+        selectsMtoMtables(session);
+        basicHql(session);
         // updateSimple(session);
         // updateList(session);
         // addMovieAndItsActors(session);
