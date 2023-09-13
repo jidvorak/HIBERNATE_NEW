@@ -4,7 +4,9 @@ import entityes.MovieEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Set;
 
 public class AppMain {
 
@@ -18,21 +20,31 @@ public class AppMain {
         Session session = DbConnect.getSession();
         Transaction transaction = session.beginTransaction();
 
+        EntityManager entityManager = session;
+
         // selects2Tables(session);
         // selectsMtoMtables(session);
         // basicHql(session);
         // updateSimple(session);
         // updateList(session);
+        // addMovieAndItsActors(session);
 
-        Integer newMovieId = insertNewMovie(session, "Duna", 1);
-        System.out.println("MOVIE ID = " + newMovieId);
+        // doresit
+        /*List<ActorEntity> olderActors = session.createQuery("from ActorEntity where movies.id=6").list(); // vyber hescu starcich 30 let
+        olderActors.forEach(ac -> { //
+            System.out.println("ac name=" + ac.getName() + " ac id=" + ac.getId());
+        });*/
 
-        ActorEntity actor = session.find(ActorEntity.class, 4);
-        actor.setAge(75);
-        session.persist(actor);
+        /*
+        ActorEntity ac = new ActorEntity();
+        ac.setName("to delete");
+        ac.setAge(44);
+        ActorEntity acPersisted = (ActorEntity) session.merge(ac);
+        //acPersisted.getId();*/
+
+
 
         transaction.commit();
-
 
         /*
         boolean vseDopaloOK = true;
@@ -46,15 +58,49 @@ public class AppMain {
 
     // *****************************************************************
 
+    // nejjednoduzsi mazani
+    private static void simpleDelete(Session session){
+        // vyber entity herec z db s id 10
+        ActorEntity ac = session.find(ActorEntity.class, 10);
+        if(ac!=null) // pokud existuje v db
+            session.remove(ac); // mazeme zazbnam dle entity
+    }
+
+    // Přidání filmu a svázání s herci vazbou m..n
+    // doporucujií modifikovat entitu (pridavat do ni) která má anotaci @JoinTable
+    private static void addMovieAndItsActors(Session session){
+        MovieEntity newMovie = insertNewMovie(session, "Film - Herci nad 30", 1); // funkce vytvozi v db novy film
+        System.out.println("ID NOVEHO FILMU=" + newMovie.getId());
+        List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber hescu starcich 30 let
+        olderActors.forEach(actorEntity -> { // loop prez vybrane herce
+            actorEntity.getMovies().add(newMovie); // kazdemu herci přidame vytvořeny film
+            session.persist(actorEntity); // ulozime herce do db
+        });
+
+        // vytvorime noveho uzivatele a pridame mu take novy film
+        ActorEntity newActor = new ActorEntity();
+        newActor.setName("Novy herec pod 30 let");
+        newActor.setAge(22);
+        newActor.getMovies().add(newMovie);
+        session.persist(newActor);
+        /*
+        // test select
+        USE mydb;
+        SELECT m.id_movie, m.name, a.id_actor, a.name, a.age
+        FROM mydb.a_actor a, mydb.a_movie m, a_movie_actor ma
+        where m.id_movie = ma.id_movie and ma.id_actor = a.id_actor and m.id_movie=6;
+        * */
+    }
+
     // zalozime novy film
-    private static Integer insertNewMovie(Session session, String moviename, Integer dirId){
+    private static MovieEntity insertNewMovie(Session session, String moviename, Integer dirId){
         DirectorEntity directorEntity = session.find(DirectorEntity.class, dirId); // nacteni rezizera d DB
         MovieEntity movieEntity = new MovieEntity(); // vytvoreni entity  film
         movieEntity.setName(moviename); // nastaveni jmena filmu
         movieEntity.setDirector(directorEntity); // nastaveni rezizera pro film
         MovieEntity savedMovie = (MovieEntity) session.merge(movieEntity); // ulozeni do db a vraceni ulozeneho filmu
         // metoda persisit take uklada jako merge, ale ta nevraci nove ulozenou entitu
-        return savedMovie.getId(); // vratime ulozene id filmu
+        return savedMovie; // vratime ulozene id filmu
     }
 
     // zmena rezisera filmu
