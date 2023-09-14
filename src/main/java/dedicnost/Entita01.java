@@ -9,7 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity
+@Entity          // díky tomuto hibernate ví, že jde o databázovou ENTITU- tedy o popis, jak vypadat tabulka
 @Table(name="entita01")
 // dedi sloupec id z ParentEntity
 @Getter

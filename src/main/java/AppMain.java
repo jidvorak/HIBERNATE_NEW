@@ -17,8 +17,8 @@ public class AppMain {
 
         System.out.println("Hibernate test");
 
-        Session session = DbConnect.getSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = DbConnect.getSession();   // getSession nám vyrobí Session- taedy naše spojení s DB
+        Transaction transaction = session.beginTransaction();  // Spustím první transakci
 
         EntityManager entityManager = session;
 
@@ -43,17 +43,18 @@ public class AppMain {
         //acPersisted.getId();*/
 
 
-
-        transaction.commit();
-
-        /*
-        boolean vseDopaloOK = true;
+         /*                           Zde se většinou v praxi dává rozhodování, jestli všechny akce dopadly OK nebo NG
+        boolean vseDopaloOK = true;   // Většinou se to dělá přes VYJÍMKY
         if(vseDopaloOK)
             transaction.commit();
         else
             transaction.rollback();
         */
-        session.close();
+        transaction.commit();
+
+
+        session.close();  // PO UKONČENÍ PROGRAMU BY SE SPOJENÍ S DB automaticky zavřelo, ale pokud chci pokračovat v programu
+                          // tak mohu libovolně otevřít session a taky zavřít
     }
 
     // *****************************************************************
@@ -180,16 +181,28 @@ public class AppMain {
     }
 
     private static void selects2Tables(Session session){
+        // session má metodu find, která pracuje s tabulkama. První argument řekne v jaké tabulce chci najít řádek s id=1.
+        // Druhý argument právě udává, jaké id  hledám. Metoda vrací typ MovieEntity.
+        // Metoda find má deklaraci: public abstract <T> T find(Class<T> aClass, Object o ), tj. vrací objekt stejného typu
+        // jako je typ třídy prvního argumentu
         MovieEntity movie = session.find(MovieEntity.class, 1);
-        System.out.println("----------------------------------");
+        System.out.println("----selects2Tables------------------------------");
+        // zde se už pak obracím na objekt movie, který je typu MovieEntity, a beru jeho GETTERY.
+        // POZOR: U director musím takto: movie.getDirector().getName(), protože movie.getDirector() vrací DirectorEntity,
+        // a na to zavolám ještě getName()
         System.out.println("FILM-> idfilmu=" + movie.getId() + ";  jmenofilmu=" + movie.getName() + "; directorname=" + movie.getDirector().getName());
         System.out.println("----------------------------------");
 
-
+        // Zde chci zjistit a vypsat režiséra s id=2, a vypsat jeho filmy
         DirectorEntity director = session.find(DirectorEntity.class, 2);
         System.out.println("REJZA-> id=" + director.getId() + "; jmeno=" + director.getName());
-
+        // První podmínka testuje, že režisér je přiřazen aspoň k nějakému filmu, a druhá podmínka testuje, že velikost
+        // kolekce movies má aspoň 1 prvek
+        // tj. getMovies je GETTER pro class field movies (je typu List<MovieEntity>) a je z class DirectorEntity
         if(director.getMovies()!=null && director.getMovies().size()>0){
+            // projdu všechny prvky kolekce movies (použiju pro ně v Lambdě proměnnou movieEntity)
+            // a vytisknu jméno každého prvku - tj. přesně jméno zadané ve sloupci Name naší tabulky MovieEntity,
+            // tj. jméno filmu
             director.getMovies().forEach(movieEntity -> {
                 System.out.println("           - film=" + movieEntity.getName() );
             });
