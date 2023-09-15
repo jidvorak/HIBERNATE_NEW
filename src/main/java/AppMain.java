@@ -174,7 +174,8 @@ public class AppMain {
 
 
     private static void printMovieAndDirector(Session session, Integer idMovie) {
-        MovieEntity movie = session.find(MovieEntity.class, idMovie);
+        // Je to v podstatě stejné jako metoda: selects2Tables
+        MovieEntity movie = session.find(MovieEntity.class, idMovie); // idMovie je objekt, a tak lze použít jako 2. argument
         System.out.println("----------------------------------");
         System.out.println("movieID=" + movie.getId() + "; movieNAME=" + movie.getName() + " directorID=" + movie.getDirector().getId() + " ; directorNAME=" + movie.getDirector().getName());
         System.out.println("----------------------------------");

@@ -41,6 +41,6 @@ public class MovieEntity {    // zde už vlastní definice naší ENTITY= tabulk
                                // fungovalo by to ale i takto: private Integer directorId
 
     @ManyToMany(mappedBy = "movies") // nazev vlastnosti z ActorEntity (Set<MovieEntity> movies = new HashSet<>())
-    private Set<ActorEntity> actors = new HashSet<>();
-
+    private Set<ActorEntity> actors = new HashSet<>(); // Musím vytvořit kolekci herců, protože každý film může mít více
+                                                       // herců
 }
