@@ -27,8 +27,31 @@ public class AppMain {
         selectsMtoMtables(session);
         basicHql(session);
   //*********ZDE UŽ PŘÍKLADY NA ÚPRAVU ÚDAJÚ V TABULKÁCH- ENTITÁCH*********
-        updateSimple(session);
+        // updateSimple(session);
         // updateList(session);
+
+        //-------------------------------------------------------------
+        // Zde chci nejprve vypsat původní stav z tabulky a_movie pro movie id=2 - tj. název filmu, id , a taky název režiséra a id
+        // Pak změnit režiséra pro movie id=2 - tj. dát mu director id=3
+        // Pak chci  UKONČIT PRVNÍ TRANSAKCI - a to tak, aby byly obě možnosti: SE ZÁPISEM ZMĚN , a BEZ ZÁPISU ZMĚN
+        // Pak začít DRUHOU TRANSAKCI
+        // Pak vytisknout nový stav
+        // Pak změnit režiséra pro movie id=2 do původního stavu - tj. dát mu zase director id=2
+        // Nakonec UKONČIT TRANSAKCI - ALE TOTO COMMIT BUDE AŽ NA KONCI
+
+        printMovieAndDirector(session,2);
+        updateMovieDirector(session,2,3);  // Nahradím v tabulce a_movie pro movie id=2 režiséra tak, že místo
+                                              // režiséra id=2 se tam zapíše režisér id=3
+        transaction.commit();      // UKONČENÍ PRVNÍ TRANSAKCE SE ZÁPISEM ZMĚN
+         //transaction.rollback();      // UKONČENÍ PRVNÍ TRANSAKCE BEZ ZÁPISU ZMĚN
+        transaction.begin();            // Spustím DRUHOU transakci
+        printMovieAndDirector(session,2);
+        updateMovieDirector(session,2,2); //změním režiséra pro movie id=2 do původního stavu - tj. dát mu zase director id=2
+        printMovieAndDirector(session,2); // vytisknu poslední stav, kde vše stejné jako původně
+           // POZOR!! DŮLEŽITÉ!! Ten poslední printMovieAndDirector bych klidně mohl dát až za COMMIT, protože je tam
+           // jen metoda FIND, což je vlastně SELECT v SQL
+        //-------------------------------------------------------------
+
         // addMovieAndItsActors(session);
 
         // doresit
@@ -53,8 +76,8 @@ public class AppMain {
             transaction.rollback();
         */
 
-        transaction.commit();      // UKONČENÍ PRVNÍ TRANSAKCE SE ZÁPISEM ZMĚN
-      //transaction.rollback();      // UKONČENÍ PRVNÍ TRANSAKCE BEZ ZÁPISU ZMĚN
+        transaction.commit();      // UKONČENÍ DRUHÉ TRANSAKCE SE ZÁPISEM ZMĚN
+      //transaction.rollback();      // UKONČENÍ DRUHÉ TRANSAKCE BEZ ZÁPISU ZMĚN
 
         session.close();  // PO UKONČENÍ PROGRAMU BY SE SPOJENÍ S DB automaticky zavřelo, ale pokud chci pokračovat v programu
                           // tak mohu libovolně otevřít session a taky zavřít
@@ -96,22 +119,27 @@ public class AppMain {
         * */
     }
 
-    // zalozime novy film
+    // zalozime novy film - tj. založíme novou Entitu
+    // Tuto metodu insertNewMovie pak použijeme v metodě addMovieAndItsActors výše
     private static MovieEntity insertNewMovie(Session session, String moviename, Integer dirId){
-        DirectorEntity directorEntity = session.find(DirectorEntity.class, dirId); // nacteni rezizera d DB
-        MovieEntity movieEntity = new MovieEntity(); // vytvoreni entity  film
-        movieEntity.setName(moviename); // nastaveni jmena filmu
-        movieEntity.setDirector(directorEntity); // nastaveni rezizera pro film
+        DirectorEntity directorEntity = session.find(DirectorEntity.class, dirId); // nacteni rezizera z DB
+        MovieEntity movieEntity = new MovieEntity(); // vytvoreni nové entity film- TJ. VLOŽÍM NOVÝ ŘÁDEK DO TABULKY a_movie (MovieEntity)
+        movieEntity.setName(moviename); // nastaveni jmena filmu pro novou Entitu
+        movieEntity.setDirector(directorEntity); // nastaveni rezizera pro nový film- použiju režiséra z tab a_director s id= dirId
         MovieEntity savedMovie = (MovieEntity) session.merge(movieEntity); // ulozeni do db a vraceni ulozeneho filmu
-        // metoda persisit take uklada jako merge, ale ta nevraci nove ulozenou entitu
-        return savedMovie; // vratime ulozene id filmu
+        // metoda persisit take uklada jako merge, ale nevraci nově ulozenou entitu. Persist nic nevrací.
+        // Co znamená ULOŽIT a VRÁTIT: ULOŽIT= Zapsat změnu do DB tabulky- tedy přidat nový řádek.
+        // VRÁTIT= chci ten NOVÝ OBJEKT vrátit a uložit do nějaké proměnné- zde do savedMovie.
+        //  A tu pak mohu vrátit jako návrat. hodnotu metody.
+        return savedMovie; // vratime ulozene id filmu - není to id, ale je to objekt typu MovieEntity
     }
 
     // zmena rezisera filmu
     private static void updateMovieDirector(Session session, Integer movieId, Integer dirId){
-        MovieEntity movie = session.find(MovieEntity.class, movieId); // nacteni filmu z db
-        DirectorEntity director = session.find(DirectorEntity.class, dirId); // nasteni rezisera z db
-        movie.setDirector(director); // nastaveni rezisera pro film
+        MovieEntity movie = session.find(MovieEntity.class, movieId); // nacteni filmu z db, číslo id pomocí parametru funkce
+        DirectorEntity director = session.find(DirectorEntity.class, dirId); // nasteni rezisera z db, číslo id pomocí parametru funkce
+        movie.setDirector(director); // Nastaveni rezisera pro film. Tj. režiséra vybraného filmu nastavím na režiséra,
+                                     // kterého vyberu pomocí druhého find
         session.persist(movie); // ulozeni filmu do db
     }
 
@@ -119,7 +147,7 @@ public class AppMain {
     private static void updateList(Session session){
         List<MovieEntity> movies = session.createQuery("from MovieEntity m").list(); // nacti list filmů- tj. těch MovieEntity
         movies.forEach(movieEntity -> { // smycka přes vsechny nactene entity
-            movieEntity.setName(movieEntity.getName() + " - m"); // nastav entite film jmeno
+            movieEntity.setName(movieEntity.getName() + " - m"); // nastav entitě film jméno - tj. získá jméno a přidá -m
             session.persist(movieEntity); // uloz do db
         });
     }
@@ -197,7 +225,7 @@ public class AppMain {
         System.out.println("----------------------------------");
     }
 
-    private static void selects2Tables(Session session){
+    private static void selects2Tables(Session session){  // Metoda FIND je vlastně jakoby SELECT v SQL
         // session má metodu find, která pracuje s tabulkama. První argument řekne v jaké tabulce chci najít řádek s id=1.
         // Druhý argument právě udává, jaké id  hledám. Metoda find vrací typ MovieEntity.
         // Metoda find má deklaraci: public abstract <T> T find(Class<T> aClass, Object o ), tj. vrací objekt stejného typu
