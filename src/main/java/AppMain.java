@@ -22,10 +22,12 @@ public class AppMain {
 
         EntityManager entityManager = session;
 
+  //*********ZDE PŘÍKLADY ČTENÍ A VYHLEDÁVÁNÍ V ENTITY*****************
         selects2Tables(session);
         selectsMtoMtables(session);
         basicHql(session);
-        // updateSimple(session);
+  //*********ZDE UŽ PŘÍKLADY NA ÚPRAVU ÚDAJÚ V TABULKÁCH- ENTITÁCH*********
+        updateSimple(session);
         // updateList(session);
         // addMovieAndItsActors(session);
 
@@ -50,8 +52,9 @@ public class AppMain {
         else
             transaction.rollback();
         */
-        transaction.commit();
 
+        transaction.commit();      // UKONČENÍ PRVNÍ TRANSAKCE SE ZÁPISEM ZMĚN
+      //transaction.rollback();      // UKONČENÍ PRVNÍ TRANSAKCE BEZ ZÁPISU ZMĚN
 
         session.close();  // PO UKONČENÍ PROGRAMU BY SE SPOJENÍ S DB automaticky zavřelo, ale pokud chci pokračovat v programu
                           // tak mohu libovolně otevřít session a taky zavřít
@@ -114,21 +117,21 @@ public class AppMain {
 
     // projde vice zaznamu a vsechny updatuje
     private static void updateList(Session session){
-        List<MovieEntity> movies = session.createQuery("from MovieEntity m").list(); // ncti list filmu
-        movies.forEach(movieEntity -> { // smycka prez vsechny nactene entity
+        List<MovieEntity> movies = session.createQuery("from MovieEntity m").list(); // nacti list filmů- tj. těch MovieEntity
+        movies.forEach(movieEntity -> { // smycka přes vsechny nactene entity
             movieEntity.setName(movieEntity.getName() + " - m"); // nastav entite film jmeno
             session.persist(movieEntity); // uloz do db
         });
     }
     // jednoducha zmena jmena dvou reziseru
     private static void updateSimple(Session session){
-        DirectorEntity director = session.find(DirectorEntity.class, 1); // nacteni z db
-        DirectorEntity director2 = session.find(DirectorEntity.class, 2); // nacteni z db
+        DirectorEntity director = session.find(DirectorEntity.class, 1); // nacteni z db , DIRECTOR S ID=1
+        DirectorEntity director2 = session.find(DirectorEntity.class, 2); // nacteni z db , DIRECTOR S ID=2
 
-        director.setName("Miloš Forman"); // zmena jmena
+        director.setName("Miloš Forman"); // zmena jmena, ale zatím je to uloženo v cache paměti, ještě jsem nezapsal do DB
         director2.setName("Francis Ford Copola"); // zmena jmena
 
-        session.persist(director); // ulozeni do db
+        session.persist(director); // uloží do DB entitu (zde director), které jsme změnili jméno
         session.persist(director2); // ulozeni do db
 
     }
