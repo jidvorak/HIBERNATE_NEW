@@ -133,19 +133,27 @@ public class AppMain {
 
     }
 
-    private static void basicHql(Session session){
+    private static void basicHql(Session session){  // Příklad na použití HQL query
 
         // HQL https://www.javatpoint.com/hql
 
-        // v HQL query je název java entity (MovieEntity)
+        // POZOR: Důležitá teorie ohledně HQL jazyka: v HQL query je název java entity (zde MovieEntity), a NE jméno
+        // databázové tabulky
 
-        //List<MovieEntity> movies = session.createQuery("from MovieEntity m").list();
+       //List<MovieEntity> movies = session.createQuery("from MovieEntity m").list(); // Takto by se pak ve forEach zobrazily všechny movies
+                                                                                       // Ten list() to jen převede na list
         //List<MovieEntity> movies = session.createQuery("from MovieEntity m where m.id>3").list();
         List<MovieEntity> movies = session.createQuery("from MovieEntity m where m.id>3 ORDER by m.id DESC").list();
+        // Je dobré tam použít tu anotaci (označení) m, tj. něco jako proměnnou, protože pak v dalších příkazech mohu použít
+        // místo MovieEntity jen toto kratší označení.
 
-        movies.forEach(movieEntity -> {
+        System.out.println("----------------------------------");
+        movies.forEach(movieEntity -> {  // zde procházím kolekci movies, kterou jsem vytvořil pomocí HQL query,
+                                         // movieEntity je proměnná pro jednotlivé prvky kolekce movies
             System.out.println("film=" + movieEntity.getName() + " id=" + movieEntity.getId());
-            if(movieEntity.getActors().size()>0){
+            // A zde pro každý prvek movieEntity z kolekce movies zjistím, zda obsahuje aspoň jednoho herce,
+            // a následně projdu tuto kolekci herců
+            if(movieEntity.getActors().size()>0){  // Opět přes GETTER získám seznam herců pro danou Movie entitu
                 movieEntity.getActors().forEach(acEntity -> {
                     System.out.println("       - actor=" + acEntity.getName());
                 });
@@ -153,15 +161,20 @@ public class AppMain {
         });
     }
     private static void selectsMtoMtables(Session session){
+        // session má metodu find, která pracuje s tabulkama. První argument řekne v jaké tabulce chci najít řádek s id=1.
+        // Druhý argument právě udává, jaké id  hledám. Metoda find vrací typ ActorEntity.
+        // Zde chci zjistit a vypsat actor s id=1, a vypsat jeho filmy
         ActorEntity actor = session.find(ActorEntity.class, 1);
+        System.out.println("----------------------------------");
         System.out.println("Actor-> ac name=" + actor.getName());
-
-        if(actor.getMovies().size()>0){
+        // podmínka testuje, že velikost kolekce movies má aspoň 1 prvek
+        if(actor.getMovies().size()>0){  // actor je objekt typu ActorEntity, ve kterém uložen výsledek vyhledání.
+                                         // Tento objekt obsahuje GETTER getMovies pro vlastnost(field) movies (je typu Set<MovieEntity>)
             actor.getMovies().forEach(movieEntity -> {
                 System.out.println("       - movie=" + movieEntity.getName());
             });
         }
-
+        // Zde chci zjistit a vypsat movie s id=1, a vypsat herce kteří v něm hrají
         MovieEntity movie = session.find(MovieEntity.class, 1);
         System.out.println("Movie-> m name=" + movie.getName());
 
@@ -183,7 +196,7 @@ public class AppMain {
 
     private static void selects2Tables(Session session){
         // session má metodu find, která pracuje s tabulkama. První argument řekne v jaké tabulce chci najít řádek s id=1.
-        // Druhý argument právě udává, jaké id  hledám. Metoda vrací typ MovieEntity.
+        // Druhý argument právě udává, jaké id  hledám. Metoda find vrací typ MovieEntity.
         // Metoda find má deklaraci: public abstract <T> T find(Class<T> aClass, Object o ), tj. vrací objekt stejného typu
         // jako je typ třídy prvního argumentu
         MovieEntity movie = session.find(MovieEntity.class, 1);

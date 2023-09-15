@@ -40,7 +40,11 @@ public class MovieEntity {    // zde už vlastní definice naší ENTITY= tabulk
                                // sloupec z DirectorEntity který chci propojit
                                // fungovalo by to ale i takto: private Integer directorId
 
-    @ManyToMany(mappedBy = "movies") // nazev vlastnosti z ActorEntity (Set<MovieEntity> movies = new HashSet<>())
+    @ManyToMany(mappedBy = "movies") // nazev vlastnosti (field) z ActorEntity (Set<MovieEntity> movies = new HashSet<>())
+                                     // Musím říct, jaká položka v té druhé  entitě je ta mapovaná.
+    // DŮLEŽITÉ: Stejně jako JoinTable a Cascade, tak i mappedBy stačí uvést jen u jedné z těch spojovaných entit.
+                                     // Je to taky kolekce, jako zde actors. Musí to být kolekce, protože pro každý prvek
+                                     // z dané Entity existuje více prvků z té 2. entity
     private Set<ActorEntity> actors = new HashSet<>(); // Musím vytvořit kolekci herců, protože každý film může mít více
-                                                       // herců
+                                                       // herců. Set je interface, HashSet je class
 }

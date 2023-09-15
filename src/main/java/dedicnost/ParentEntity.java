@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-@MappedSuperclass   // predek pro jine entity
+@MappedSuperclass   // predek pro jine entity, tj. tímto řeknu, že tato třída může být děděna
 @Getter
 @Setter
 public class ParentEntity {
