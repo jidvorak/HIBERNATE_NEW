@@ -59,7 +59,7 @@ public class AppMain {
         // ******************************************************************
 
         // NEW
-        selectJoinAndDelete(session);
+        //selectJoinAndDelete(session);
 
         // pridani
         //addMovieAndItsActors(session);
