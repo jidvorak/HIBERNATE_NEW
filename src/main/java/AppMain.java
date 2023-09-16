@@ -67,8 +67,20 @@ public class AppMain {
 
     private static void selectJoinAndDelete(Session session){
 
-        // select JOIN
-        String selectstring = "FROM ActorEntity actorAlias " + // select z tabulka actor (název se bere z entity)
+        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
+
+        // jednoduchy select vraci pole entit herec
+        List<ActorEntity> actors = session.createQuery("FROM ActorEntity where id<3").list();
+        actors.forEach(actorEntity -> {
+            System.out.println("simple select - ACTOR = " + actorEntity.getName());
+        });
+
+        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
+        // select JOIN - POZOR - VRACI POLE entit herec a film
+        String selectstring =
+                "FROM ActorEntity actorAlias " + // select z tabulka actor (název se bere z entity)
                 "JOIN actorAlias.movies movieAlias " + // Join movies je vlastnost entity ActorEntity
                 "WHERE movieAlias.id = 6"; // id filmu
 
@@ -78,7 +90,6 @@ public class AppMain {
         // smycka prez vracene zaznamy
         for(int cisloradku=0; cisloradku<actorsAndMovie.size();cisloradku++){
 
-
             Object[] poleDataRadku = (Object[]) actorsAndMovie.get(cisloradku); // načteme pole z řádku číslo i
 
             ActorEntity actor = (ActorEntity)poleDataRadku[0]; // nacteni herce z pole (z radku)
@@ -87,6 +98,7 @@ public class AppMain {
             System.out.println("ac name=" + actor.getName() + " mo name=" + movie.getName());
             //session.remove(a);
         }
+        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
     }
 
