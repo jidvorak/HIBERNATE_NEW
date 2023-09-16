@@ -18,15 +18,22 @@ public class CrApiTestClass {
         session = aSession;
     }
 
-    public void runItWithWhere(String name, Integer age){
+    public void runItWithWhere(String name, Integer ageVetsi){
+
+        // skladani vyberovych podminek pomoci objektu a nikoli HQL retezcu
+
         CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<ActorEntity> criteriaQuery = criteriaBuilder.createQuery(ActorEntity.class);
         Root<ActorEntity> root = criteriaQuery.from(ActorEntity.class);
-        List<Predicate> preList = new ArrayList<Predicate>();
+
+        List<Predicate> preList = new ArrayList<Predicate>(); // položky ve where
+
         if(name!=null)
-            preList.add(criteriaBuilder.like(root.get("name"), name));
-        if(age!=null)
-            preList.add(criteriaBuilder.greaterThan(root.get("age"), age));
+            preList.add(criteriaBuilder.like(root.get("name"), name)); // pokud je nenulovy name dame do where
+        if(ageVetsi!=null)
+            preList.add(criteriaBuilder.greaterThan(root.get("age"), ageVetsi));  // pokud je nenulovy name dame do where
+
+        // criteriaBuilder.equal() // to co je ve where = like...
 
         Predicate[] predicates = preList.toArray(new Predicate[0]);
 
