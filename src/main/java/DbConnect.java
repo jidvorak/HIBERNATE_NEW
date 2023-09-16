@@ -1,6 +1,4 @@
-import entityes.ActorEntity;
-import entityes.DirectorEntity;
-import entityes.MovieEntity;
+import entityes.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -13,6 +11,8 @@ public class DbConnect {
                 .addAnnotatedClass(MovieEntity.class)
                 .addAnnotatedClass(DirectorEntity.class)
                 .addAnnotatedClass(ActorEntity.class)
+                .addAnnotatedClass(PlayerEntity.class)
+                .addAnnotatedClass(TeamEntity.class)
                 .buildSessionFactory();
         Session session = sessionFactory.openSession();
         return session;

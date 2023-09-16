@@ -1,7 +1,5 @@
 import CriteriaApi.CrApiTestClass;
-import entityes.ActorEntity;
-import entityes.DirectorEntity;
-import entityes.MovieEntity;
+import entityes.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -32,7 +30,7 @@ public class AppMain {
         // ******************************************************************
 
         // NEW
-        selectJoinAndDelete(session);
+//        selectJoinAndDelete(session);
 
         // pridani
         //addMovieAndItsActors(session);
@@ -48,6 +46,32 @@ public class AppMain {
         ac.setAge(44);
         ActorEntity acPersisted = (ActorEntity) session.merge(ac);
         //acPersisted.getId();*/
+
+
+        // merge ulozi a vraci ulozeny objekt
+        // persist pouze ulozi
+        TeamEntity arsenal = new TeamEntity();
+        arsenal.setName("Arsenal");
+        TeamEntity savedArsenal = (TeamEntity) session.merge(arsenal);
+
+        PlayerEntity saka = new PlayerEntity();
+        saka.setName("Saka");
+        saka.setTeam(savedArsenal);
+        session.persist(saka);
+
+        PlayerEntity martineli = new PlayerEntity();
+        martineli.setName("Martineli");
+        martineli.setTeam(savedArsenal);
+        session.persist(martineli);
+
+
+        List<PlayerEntity> players = session.createQuery("From PlayerEntity").list();
+        players.forEach(playerEntity -> {
+            System.out.println(playerEntity.getName());
+            playerEntity.setName("random");
+//            session.remove(playerEntity);
+            session.persist(playerEntity);
+        });
 
 
 
