@@ -32,7 +32,7 @@ public class AppMain {
         // ******************************************************************
 
         // NEW
-        //selectJoinAndDelete(session);
+        selectJoinAndDelete(session);
 
         // pridani
         //addMovieAndItsActors(session);
@@ -69,13 +69,13 @@ public class AppMain {
     private static void selectJoinAndDelete(Session session){
 
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-
+/*
         // jednoduchy select vraci pole entit herec
         List<ActorEntity> actors = session.createQuery("FROM ActorEntity where id<3").list();
         actors.forEach(actorEntity -> {
             System.out.println("simple select - ACTOR = " + actorEntity.getName());
         });
-
+*/
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
         // select JOIN - POZOR - VRACI POLE entit herec a film
@@ -98,7 +98,7 @@ public class AppMain {
             System.out.println("ac name=" + actor.getName() + " mo name=" + movie.getName());
 
             // mazani hercu kteri hraji ve filmu s id 6
-            // session.remove(actor);
+            session.remove(actor);
         }
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
