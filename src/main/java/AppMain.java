@@ -39,8 +39,8 @@ public class AppMain {
         // Pak změnit režiséra pro movie id=2 do původního stavu - tj. dát mu zase director id=2
         // Nakonec UKONČIT TRANSAKCI - ALE TOTO COMMIT BUDE AŽ NA KONCI
 
-//        printMovieAndDirector(session,2);
-//        updateMovieDirector(session,2,3);  // Nahradím v tabulce a_movie pro movie id=2 režiséra tak, že místo
+    //    printMovieAndDirector(session,2);
+    //    updateMovieDirector(session,2,3);  // Nahradím v tabulce a_movie pro movie id=2 režiséra tak, že místo
                                               // režiséra id=2 se tam zapíše režisér id=3
         transaction.commit();      // UKONČENÍ PRVNÍ TRANSAKCE SE ZÁPISEM ZMĚN
          //transaction.rollback();      // UKONČENÍ PRVNÍ TRANSAKCE BEZ ZÁPISU ZMĚN
@@ -52,14 +52,14 @@ public class AppMain {
            // jen metoda FIND, což je vlastně SELECT v SQL
         //-------------------------------------------------------------
         // VLOŽENÍ NOVÉHO FILMU DO TABULKY a_movie A UKÁZKA AUTOINCREMENT
-        insertNewMovie(session, "Nový film pres insert",1);
+        //insertNewMovie(session, "Nový film pres insert",1);
 
         // addMovieAndItsActors(session);
 
         // ******************************************************************
 
         // NEW
-        selectJoinAndDelete(session);
+        //selectJoinAndDelete(session);
 
         // pridani
         //addMovieAndItsActors(session);
