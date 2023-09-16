@@ -78,6 +78,7 @@ public class AppMain {
         // smycka prez vracene zaznamy
         for(int cisloradku=0; cisloradku<actorsAndMovie.size();cisloradku++){
 
+
             Object[] poleDataRadku = (Object[]) actorsAndMovie.get(cisloradku); // načteme pole z řádku číslo i
 
             ActorEntity actor = (ActorEntity)poleDataRadku[0]; // nacteni herce z pole (z radku)
