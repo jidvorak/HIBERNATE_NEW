@@ -1,3 +1,4 @@
+import CriteriaApi.CrApiTestClass;
 import entityes.ActorEntity;
 import entityes.DirectorEntity;
 import entityes.MovieEntity;
@@ -6,7 +7,6 @@ import org.hibernate.Transaction;
 
 import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.Set;
 
 public class AppMain {
 
@@ -22,18 +22,25 @@ public class AppMain {
 
         EntityManager entityManager = session;
 
-        // selects2Tables(session);
+         //selects2Tables(session);
         // selectsMtoMtables(session);
         // basicHql(session);
         // updateSimple(session);
         // updateList(session);
         // addMovieAndItsActors(session);
 
-        // doresit
-        /*List<ActorEntity> olderActors = session.createQuery("from ActorEntity where movies.id=6").list(); // vyber hescu starcich 30 let
-        olderActors.forEach(ac -> { //
-            System.out.println("ac name=" + ac.getName() + " ac id=" + ac.getId());
-        });*/
+        // ******************************************************************
+
+        // NEW
+        selectJoinAndDelete(session);
+
+        // pridani
+        //addMovieAndItsActors(session);
+
+        //CrApiTestClass crapi = new CrApiTestClass(session);
+        //crapi.runItWithWhere("%J%", 28);
+
+        // ******************************************************************
 
         /*
         ActorEntity ac = new ActorEntity();
@@ -57,6 +64,32 @@ public class AppMain {
     }
 
     // *****************************************************************
+
+    private static void selectJoinAndDelete(Session session){
+
+        // select JOIN
+        String selectstring = "FROM ActorEntity actorAlias " + // select z tabulka actor (název se bere z entity)
+                "JOIN actorAlias.movies movieAlias " + // Join movies je vlastnost entity ActorEntity
+                "WHERE movieAlias.id = 6"; // id filmu
+
+        // když pouřijeme výše popsaný JOIN, hibernate vrací pole objektů kde je herec i film entity
+        List<?> actorsAndMovie = session.createQuery(selectstring).list(); // 5 záznamů typu (Object[]) v nwm je objec
+
+        // smycka prez vracene zaznamy
+        for(int cisloradku=0; cisloradku<actorsAndMovie.size();cisloradku++){
+
+
+            Object[] poleDataRadku = (Object[]) actorsAndMovie.get(cisloradku); // načteme pole z řádku číslo i
+
+            ActorEntity actor = (ActorEntity)poleDataRadku[0]; // nacteni herce z pole (z radku)
+            MovieEntity movie = (MovieEntity)poleDataRadku[1]; // nacteni filmu z pole (radku)
+
+            System.out.println("ac name=" + actor.getName() + " mo name=" + movie.getName());
+            //session.remove(a);
+        }
+
+    }
+
 
     // nejjednoduzsi mazani
     private static void simpleDelete(Session session){
@@ -180,7 +213,9 @@ public class AppMain {
     }
 
     private static void selects2Tables(Session session){
+
         MovieEntity movie = session.find(MovieEntity.class, 1);
+
         System.out.println("----------------------------------");
         System.out.println("FILM-> idfilmu=" + movie.getId() + ";  jmenofilmu=" + movie.getName() + "; directorname=" + movie.getDirector().getName());
         System.out.println("----------------------------------");
