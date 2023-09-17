@@ -23,9 +23,9 @@ public class ActorEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="name")
-    private String name;
-
+    @Column(name="name", nullable = false)   // pomocí nullable mohu kontrolovat v hibernate, jestli sloupec name=null
+    private String name;                     // pomocí false tu kontrolu asi vypnu, tj. kontrolu nechám na MySQL DB
+                                             // implicitně je nullable = TRUE
     @Column(name="age")
     private Integer age;
 

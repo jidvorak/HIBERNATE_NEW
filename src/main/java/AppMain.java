@@ -22,11 +22,11 @@ public class AppMain {
 
         EntityManager entityManager = session;
 
-  //*********ZDE PŘÍKLADY ČTENÍ A VYHLEDÁVÁNÍ V ENTITY*****************
+  //*********ZDE PŘÍKLADY ČTENÍ A VYHLEDÁVÁNÍ V ENTITY*********************************************
         selects2Tables(session);
         selectsMtoMtables(session);
         basicHql(session);
-  //*********ZDE UŽ PŘÍKLADY NA ÚPRAVU a VLOŽENÍ ÚDAJÚ V TABULKÁCH- ENTITÁCH*********
+  //*********ZDE UŽ PŘÍKLADY NA ÚPRAVU a VLOŽENÍ ÚDAJÚ V TABULKÁCH- ENTITÁCH************************
         // updateSimple(session);
         // updateList(session);
 
@@ -52,31 +52,45 @@ public class AppMain {
            // jen metoda FIND, což je vlastně SELECT v SQL
         //-------------------------------------------------------------
         // VLOŽENÍ NOVÉHO FILMU DO TABULKY a_movie A UKÁZKA AUTOINCREMENT
-        //insertNewMovie(session, "Nový film pres insert",1);
+        // insertNewMovie(session, "Nový film pres insert",1);
+        //-------------------------------------------------------------
 
-        // addMovieAndItsActors(session);
+        // Vložení hodnot do nového sloupce AGE v tabulce a_actor
+//        ActorEntity actor= session.find(ActorEntity.class, 4); // Vyselektuju herce BARTOŠKA
+//        actor.setAge(70);  //nastavím hodnotu
+//        session.persist(actor);  // uložím do DB
+        //---------------------------------------------------------------
 
-        // ******************************************************************
+        // Vytvoření new movie, a pak vyselektujeme herce co mají více než 30 let.
+        // Pak každému z těchto herců přiřadím ten nový movie do jeho seznamu movies.
+        // Nakonec musím otestovat pomocí SQL query přímo v MySQL - kód je napsaný pod metodou addMovieAndItsActors
+ //        addMovieAndItsActors(session);
 
+        // *************SELECT a JOIN - POZOR - VRACI POLE entit herec a film*******************************
         // NEW
         //selectJoinAndDelete(session);
+        //**************************************************************************************************
 
-        // pridani
-        //addMovieAndItsActors(session);
-
-        // criteria query
+        // ******************** CRITERIA QUERY = CR API *************************************************************
         //CrApiTestClass crapi = new CrApiTestClass(session);
         //crapi.runItWithWhere("%J%", 28);
-
         // ******************************************************************
 
-        /*
-        ActorEntity ac = new ActorEntity();
-        ac.setName("to delete");
-        ac.setAge(44);
-        ActorEntity acPersisted = (ActorEntity) session.merge(ac);
-        //acPersisted.getId();*/
+        //****************JEDNODUCHÝ DELETE ***********************************************************
 
+        // Nejprve si vytvořím nový ZÁZNAM, který potom VYMAŽU
+
+//        ActorEntity ac = new ActorEntity();
+//        ac.setName("to delete");
+//        ac.setAge(44);
+//        ActorEntity acPersisted = (ActorEntity) session.merge(ac);
+//        //acPersisted.getId();  // Chtěl si původně vypisovat ID toho nového záznamu, ale rozhodl se, že se
+//                                  // jen podívá do DB jestli to tam vzniklo
+
+        // ZDE VLASTNÍ DELETE
+        // simpleDelete(session);  // POZOR: Do vlastní metody simpleDelete vždy zadat ID, pod kterým se opravdu
+                                   // ten nový ZÁZNAM vytvořil
+        //********************************************************************************************
 
          /*                           Zde se většinou v praxi dává rozhodování, jestli všechny akce dopadly OK nebo NG
         boolean vseDopaloOK = true;   // Většinou se to dělá přes VYJÍMKY
@@ -137,30 +151,52 @@ public class AppMain {
     // nejjednoduzsi mazani
     private static void simpleDelete(Session session){
         // vyber entity herec z db s id 10
-        ActorEntity ac = session.find(ActorEntity.class, 10);
-        if(ac!=null) // pokud existuje v db
-            session.remove(ac); // mazeme zazbnam dle entity
+        ActorEntity ac = session.find(ActorEntity.class, 12); // POZOR: Jako 2.argument zadat ID, pod kterým se opravdu
+                                                                  // ten nový ZÁZNAM vytvořil- tj. ten s názvem: "to delete"
+                                                                  // Viz. sekce JEDNODUCHÝ DELETE nahoře kde spouštím
+        if(ac!=null)            // pokud existuje v db
+            session.remove(ac); // mazeme zaznam dle entity
     }
 
     // Přidání filmu a svázání s herci vazbou m..n
     // doporucujií modifikovat entitu (pridavat do ni) která má anotaci @JoinTable
+    // Protože každý herec má seznam movies.
+    // Zde tedy nejprve vytvoříme nový movie, a pak si vyselektujeme herce co mají více než 30 let.
+    // Pak každému z těchto herců přiřadím ten nový movie do jeho seznamu movies.
+    // POZOR: Správné vykonání metody  addMovieAndItsActors si musím otestovat pomocí SQL query přímo v MySQL - viz. níže.
     private static void addMovieAndItsActors(Session session){
-        MovieEntity newMovie = insertNewMovie(session, "Film - Herci nad 30", 1); // funkce vytvozi v db novy film
+        MovieEntity newMovie = insertNewMovie(session, "Film - Herci nad 30", 1); // funkce vytvozi v db novy film s directorem id=1
         System.out.println("ID NOVEHO FILMU=" + newMovie.getId());
-        List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber hescu starcich 30 let
-        olderActors.forEach(actorEntity -> { // loop prez vybrane herce
-            actorEntity.getMovies().add(newMovie); // kazdemu herci přidame vytvořeny film
-            session.persist(actorEntity); // ulozime herce do db
+        List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber herců staršich 30 let
+        olderActors.forEach(actorEntity -> { // loop přes vybrane herce
+            actorEntity.getMovies().add(newMovie); // nejprve získám aktuální seznam movies (getMovies) pro každého actora, kterého jsme
+                                                   // vvyselektovali pomocí HQL query (v createQuery), kazdemu herci kterému je nad 30let
+                                                   // do jeho seznamu přidame vytvořeny film. newMovie vytvořím pomocí metody insertNewMovie
+            session.persist(actorEntity); // a takto zmodifikovaného herce ulozime do db
         });
 
         // vytvorime noveho uzivatele a pridame mu take novy film
+        // POZOR: pokud tento kód aktivní zároveň s hlavním kódem pro addMovieAndItsActors výše, tak dojde k tomu, že po
+        // TEST SELECT níže se zobrazí ve výsledné tabulce i tento "Novy herec pod 30 let" , protože je mu následně
+        // taky přiřazen ten newMovie, a taky splňuje podmínky dané spojovací tabulkou v testovacím SQL query.
         ActorEntity newActor = new ActorEntity();
         newActor.setName("Novy herec pod 30 let");
         newActor.setAge(22);
         newActor.getMovies().add(newMovie);
         session.persist(newActor);
-        /*
-        // test select
+
+        /*  POZOR: Správné vykonání metody  addMovieAndItsActors si musím otestovat.
+        // TEST SELECT: Je to ukázka jak si mohu hezky pomocí SQL příkazů v MySQL otestovat to, že mi SPRÁVNĚ FUNGUJE
+        // METODA addMovieAndItsActors. Níže uvedený SQL query musím zadat do MySQL a spustit poté, co se provede
+        // addMovieAndItsActors metoda.
+        // V té sekci FROM jsem si zrovna ty dlouhé názvy tabulek namapoval na kratší jednopísmenné (a, m, ma)
+        // Budu chtít zobrazit ve výsledku tyto sloupce: id a name z movie tab. id, name a age z actor tab.
+        // A spojuji tabulky přes id_movie a id_actor a taky podmínka id_movie=6
+        // A ono to krásně vyselektuje podle id_movie a k tomu vždy adekvátní id_actor postupně na každý řádek-
+        // tj. vždy to krásně přiřadí dle té shody - takto udělá bez té poslední podmínky m.id_movie=6.
+        // TA POSLEDNÍ PODMÍNKA MI VYSELEKTUJE PŘÍMO TEN NOVÝ FILM , KTERÝ MÁ ID=6, ALE POZOR, U MNE MŮŽE MÍT I
+        // JINÉ ID. TJ. VŽDY SE PODÍVAT JAKÉ ID MÁ MŮJ NOVÝ FILM, PROTOŽE JE TAM AUTOINKREMENT.
+        // A K NĚMU ZOBRAZÍ TY HERCE NAD 30LET.
         USE mydb;
         SELECT m.id_movie, m.name, a.id_actor, a.name, a.age
         FROM mydb.a_actor a, mydb.a_movie m, a_movie_actor ma
