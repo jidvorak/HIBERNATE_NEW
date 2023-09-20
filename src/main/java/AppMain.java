@@ -64,7 +64,7 @@ public class AppMain {
         // Vytvoření new movie, a pak vyselektujeme herce co mají více než 30 let.
         // Pak každému z těchto herců přiřadím ten nový movie do jeho seznamu movies.
         // Nakonec musím otestovat pomocí SQL query přímo v MySQL - kód je napsaný pod metodou addMovieAndItsActors
-    //     addMovieAndItsActors(session);
+        addMovieAndItsActors(session);
 
         // *************SELECT a JOIN - POZOR - VRACI POLE entit herec a film *******************************
         // NEW . // POZOR: Před touto metodou vždy nutno spustit samostatně metodu : addMovieAndItsActors !!!!!!!!!!!!!!!!!!!!!!
@@ -135,11 +135,11 @@ public class AppMain {
                  // Propojím obě tabulky, tak jak je uděláno v MySQL v tabulce a_movie_actor.
                  // Princip propojení: viz. @ManyToMany v ActorEntity a MovieEntity. V MovieEntity je  mappedBy = "movies",
                  // a tím je dáno propojení na vlastnost movies v Actorentity.
-                "WHERE movieAlias.id = 14"; // Z tabulky vyberu jen řádky kde id filmu=6 (nebo dle situace ID). Tj. vypis hercu z filmu 6
+                "WHERE movieAlias.id = 18"; // Z tabulky vyberu jen řádky kde id filmu=6 (nebo dle situace ID). Tj. vypis hercu z filmu 6
 
         // když použijeme výše popsaný JOIN, hibernate vrací pole objektů kde je herec i film entity
-        List<?> actorsAndMovie = session.createQuery(selectstring).list(); // 5 záznamů typu (Object[]) v nwm je objec
-
+        List<?> actorsAndMovie = session.createQuery(selectstring).list(); // Získám 5 položek typu Object[]
+                               // a v každém poli objektů jsou uloženy Entity: ActorEntity a MovieEntity
         // Smycka přes vrácené zaznamy. Cisloradku tedy udává číslo položky v seznamu - protože každá položka vráceného
         // seznamu znamená jeden řádek z vysledné tabulky po QUERY, a typově jde o POLE OBJEKTŮ.
         for(int cisloradku=0; cisloradku<actorsAndMovie.size();cisloradku++){
