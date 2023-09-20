@@ -2,6 +2,8 @@ package entityes;
 
 import javax.persistence.*;
 
+// TOTO UKÁZKA JAK NAMODELOVAT ENTITU V HIBERNATE KTERÁ SLOUČÍ HODNOTY ZE 2 TABULEK
+// JAK TEDY VYBÍRÁM ZE 2 TABULEK
 // entita reprezentuje přístup ke dvoum tabulkám - dodělat obsluhu.
 @Entity
 @Table(name="a_movie")
@@ -21,7 +23,7 @@ public class MovieDirectorEntity {
 
 }
 
-/*
+/*   // ZDE UKÁZKA JAK TO UDĚLAT V SQL
 SELECT m.name film, d.name rejza
 FROM mydb.a_movie m, mydb.a_director d
 WHERE m.director_id=d.director_id;

@@ -120,14 +120,14 @@ public class AppMain {
 
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 /*
-        // jednoduchy select vraci pole entit herec- JE TO KLASIKA, stejně jako v metodě addMovieAndItsActors !!!!!
+        // jednoduchy select z 1 TABULKY vraci pole entit herec- JE TO KLASIKA, stejně jako v metodě addMovieAndItsActors !!!!!
         List<ActorEntity> actors = session.createQuery("FROM ActorEntity where id<3").list();
         actors.forEach(actorEntity -> {
             System.out.println("simple select - ACTOR = " + actorEntity.getName());
         });
 */
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-
+        // ZDE UKÁZKA PROPOJENÍ PŘES VAZEBNÍ TABULKU
         // SELECT - JOIN : POZOR - VRACI POLE entit herec a film . Používám zde HQL query.
         String selectstring =
                 "FROM ActorEntity actorAlias " + // select z tabulka a_actor (název se bere z entity- tj. actorEntity)
@@ -135,7 +135,7 @@ public class AppMain {
                  // Propojím obě tabulky, tak jak je uděláno v MySQL v tabulce a_movie_actor.
                  // Princip propojení: viz. @ManyToMany v ActorEntity a MovieEntity. V MovieEntity je  mappedBy = "movies",
                  // a tím je dáno propojení na vlastnost movies v Actorentity.
-                "WHERE movieAlias.id = 18"; // Z tabulky vyberu jen řádky kde id filmu=6 (nebo dle situace ID). Tj. vypis hercu z filmu 6
+                "WHERE movieAlias.id = 20"; // Z tabulky vyberu jen řádky kde id filmu=6 (nebo dle situace ID). Tj. vypis hercu z filmu 6
 
         // když použijeme výše popsaný JOIN, hibernate vrací pole objektů kde je herec i film entity
         List<?> actorsAndMovie = session.createQuery(selectstring).list(); // Získám 5 položek typu Object[]
@@ -145,14 +145,18 @@ public class AppMain {
         for(int cisloradku=0; cisloradku<actorsAndMovie.size();cisloradku++){
 
             Object[] poleDataRadku = (Object[]) actorsAndMovie.get(cisloradku); // načteme pole z řádku číslo i
-                                                                           // tedy z položky i ve výsledném Listu
-            // Toto pole objektů (Object[]) obsahuje asi údaj o herci a filmu, TEDY OBSAHUJE 2 OBJEKTY- ZDE ENTITy.
+                                                                 // tedy z položky i ve výsledném Listu actorsAndMovie.
+            // Toto pole objektů (Object[]) obsahuje údaj o herci a filmu, TEDY OBSAHUJE 2 OBJEKTY- ZDE ENTITy.
             ActorEntity actor = (ActorEntity)poleDataRadku[0]; // nacteni herce z daného pole (z radku)
             MovieEntity movie = (MovieEntity)poleDataRadku[1]; // nacteni filmu z daného pole (z radku)
 
             System.out.println("ac name=" + actor.getName() + " mo name=" + movie.getName());
 
-            // mazani hercu kteri hraji ve filmu s id 6
+            // mazani hercu kteri hraji ve filmu s id 6 (nebo jiným ID podle toho jak se to vytvoří)
+            // Netřeba zde zadávat to ID, protože k mazání dojde hned po výpisu v rámci cyklu FOR
+            // A mažu jen daný výsledný řádek- tj. daného herce (Actor Entity) vzniklého po našem HQL QUERY
+            // Díky DETACH v ActorEntity smažu nejen řádky ve VAZEBNÍ TABULCE KDE FIGURUJE DANÝ HEREC, ALE I DANÉHO HERCE
+            // Z TABULKY a_actor !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             //session.remove(actor);
         }
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
@@ -170,7 +174,7 @@ public class AppMain {
             session.remove(ac); // mazeme zaznam dle entity
     }
 
-    // Přidání filmu a svázání s herci vazbou m..n
+    // Přidání filmu a svázání s herci vazbou m..n . To přiřazení herců k novému filmu se provede do VAZEBNÍ TABULKY a_movie_actor
     // doporucujií modifikovat entitu (pridavat do ni) která má anotaci @JoinTable
     // Protože každý herec má seznam movies.
     // Zde tedy nejprve vytvoříme nový movie, a pak si vyselektujeme herce co mají více než 30 let.
