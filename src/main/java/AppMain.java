@@ -64,11 +64,14 @@ public class AppMain {
         // Vytvoření new movie, a pak vyselektujeme herce co mají více než 30 let.
         // Pak každému z těchto herců přiřadím ten nový movie do jeho seznamu movies.
         // Nakonec musím otestovat pomocí SQL query přímo v MySQL - kód je napsaný pod metodou addMovieAndItsActors
- //        addMovieAndItsActors(session);
+    //     addMovieAndItsActors(session);
 
-        // *************SELECT a JOIN - POZOR - VRACI POLE entit herec a film*******************************
-        // NEW
-        //selectJoinAndDelete(session);
+        // *************SELECT a JOIN - POZOR - VRACI POLE entit herec a film *******************************
+        // NEW . // POZOR: Před touto metodou vždy nutno spustit samostatně metodu : addMovieAndItsActors !!!!!!!!!!!!!!!!!!!!!!
+                 // Aby tam vznikl nový film s ID=6 (nebo jiné ID dle situace) a tento film se přiřadil k hercům starším 30let.
+                 // Pak metodu addMovieAndItsActors zakomentovat a pustit samostatně tuto metodu selectJoinAndDelete,
+                 // kde uvedu správné ID toho nového filmu do  "WHERE movieAlias.id = 6".
+        selectJoinAndDelete(session);
         //**************************************************************************************************
 
         // ******************** CRITERIA QUERY = CR API *************************************************************
@@ -109,11 +112,15 @@ public class AppMain {
 
     // *****************************************************************
 
+    // POZOR: Před touto metodou vždy nutno spustit samostatně metodu : addMovieAndItsActors !!!!!!!!!!!!!!!!!!!!!!
+    // Aby tam vznikl nový film s ID=6 (nebo jiné ID dle situace) a tento film se přiřadil k hercům starším 30let.
+    // Pak metodu addMovieAndItsActors zakomentovat a pustit samostatně tuto metodu selectJoinAndDelete,
+    // kde uvedu správné ID toho nového filmu do   "WHERE movieAlias.id = 6" .
     private static void selectJoinAndDelete(Session session){
 
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 /*
-        // jednoduchy select vraci pole entit herec
+        // jednoduchy select vraci pole entit herec- JE TO KLASIKA, stejně jako v metodě addMovieAndItsActors !!!!!
         List<ActorEntity> actors = session.createQuery("FROM ActorEntity where id<3").list();
         actors.forEach(actorEntity -> {
             System.out.println("simple select - ACTOR = " + actorEntity.getName());
@@ -121,27 +128,32 @@ public class AppMain {
 */
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
-        // select JOIN - POZOR - VRACI POLE entit herec a film
+        // SELECT - JOIN : POZOR - VRACI POLE entit herec a film . Používám zde HQL query.
         String selectstring =
-                "FROM ActorEntity actorAlias " + // select z tabulka actor (název se bere z entity)
-                "JOIN actorAlias.movies movieAlias " + // Join movies je vlastnost entity ActorEntity
-                "WHERE movieAlias.id = 6"; // (id filmu) vypis hercu z filmu 6
+                "FROM ActorEntity actorAlias " + // select z tabulka a_actor (název se bere z entity- tj. actorEntity)
+                "JOIN actorAlias.movies movieAlias " + // Join přes vlastnost movies (ta je z entity ActorEntity).
+                 // Propojím obě tabulky, tak jak je uděláno v MySQL v tabulce a_movie_actor.
+                 // Princip propojení: viz. @ManyToMany v ActorEntity a MovieEntity. V MovieEntity je  mappedBy = "movies",
+                 // a tím je dáno propojení na vlastnost movies v Actorentity.
+                "WHERE movieAlias.id = 14"; // Z tabulky vyberu jen řádky kde id filmu=6 (nebo dle situace ID). Tj. vypis hercu z filmu 6
 
-        // když pouřijeme výše popsaný JOIN, hibernate vrací pole objektů kde je herec i film entity
+        // když použijeme výše popsaný JOIN, hibernate vrací pole objektů kde je herec i film entity
         List<?> actorsAndMovie = session.createQuery(selectstring).list(); // 5 záznamů typu (Object[]) v nwm je objec
 
-        // smycka prez vracene zaznamy
+        // Smycka přes vrácené zaznamy. Cisloradku tedy udává číslo položky v seznamu - protože každá položka vráceného
+        // seznamu znamená jeden řádek z vysledné tabulky po QUERY, a typově jde o POLE OBJEKTŮ.
         for(int cisloradku=0; cisloradku<actorsAndMovie.size();cisloradku++){
 
             Object[] poleDataRadku = (Object[]) actorsAndMovie.get(cisloradku); // načteme pole z řádku číslo i
-
-            ActorEntity actor = (ActorEntity)poleDataRadku[0]; // nacteni herce z pole (z radku)
-            MovieEntity movie = (MovieEntity)poleDataRadku[1]; // nacteni filmu z pole (radku)
+                                                                           // tedy z položky i ve výsledném Listu
+            // Toto pole objektů (Object[]) obsahuje asi údaj o herci a filmu, TEDY OBSAHUJE 2 OBJEKTY- ZDE ENTITy.
+            ActorEntity actor = (ActorEntity)poleDataRadku[0]; // nacteni herce z daného pole (z radku)
+            MovieEntity movie = (MovieEntity)poleDataRadku[1]; // nacteni filmu z daného pole (z radku)
 
             System.out.println("ac name=" + actor.getName() + " mo name=" + movie.getName());
 
             // mazani hercu kteri hraji ve filmu s id 6
-            session.remove(actor);
+            //session.remove(actor);
         }
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
@@ -164,10 +176,11 @@ public class AppMain {
     // Zde tedy nejprve vytvoříme nový movie, a pak si vyselektujeme herce co mají více než 30 let.
     // Pak každému z těchto herců přiřadím ten nový movie do jeho seznamu movies.
     // POZOR: Správné vykonání metody  addMovieAndItsActors si musím otestovat pomocí SQL query přímo v MySQL - viz. níže.
+    // Používám zde HQL query
     private static void addMovieAndItsActors(Session session){
         MovieEntity newMovie = insertNewMovie(session, "Film - Herci nad 30", 1); // funkce vytvozi v db novy film s directorem id=1
         System.out.println("ID NOVEHO FILMU=" + newMovie.getId());
-        List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber herců staršich 30 let
+        List<ActorEntity> olderActors = session.createQuery("from ActorEntity where age>30").list(); // vyber řádků s herci staršich 30 let
         olderActors.forEach(actorEntity -> { // loop přes vybrane herce
             actorEntity.getMovies().add(newMovie); // nejprve získám aktuální seznam movies (getMovies) pro každého actora, kterého jsme
                                                    // vvyselektovali pomocí HQL query (v createQuery), kazdemu herci kterému je nad 30let
@@ -228,7 +241,7 @@ public class AppMain {
         session.persist(movie); // ulozeni filmu do db
     }
 
-    // projde vice zaznamu a vsechny updatuje
+    // projde vice zaznamu a vsechny updatuje , získání list filmů pomocí  HQL query
     private static void updateList(Session session){
         List<MovieEntity> movies = session.createQuery("from MovieEntity m").list(); // nacti list filmů- tj. těch MovieEntity
         movies.forEach(movieEntity -> { // smycka přes vsechny nactene entity
