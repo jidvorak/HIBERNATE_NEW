@@ -1,3 +1,4 @@
+import CriteriaApi.CrApiTestClass;
 import entityes.ActorEntity;
 import entityes.DirectorEntity;
 import entityes.MovieEntity;
@@ -64,19 +65,29 @@ public class AppMain {
         // Vytvoření new movie, a pak vyselektujeme herce co mají více než 30 let.
         // Pak každému z těchto herců přiřadím ten nový movie do jeho seznamu movies.
         // Nakonec musím otestovat pomocí SQL query přímo v MySQL - kód je napsaný pod metodou addMovieAndItsActors
-        addMovieAndItsActors(session);
+        // addMovieAndItsActors(session);
 
         // *************SELECT a JOIN - POZOR - VRACI POLE entit herec a film *******************************
         // NEW . // POZOR: Před touto metodou vždy nutno spustit samostatně metodu : addMovieAndItsActors !!!!!!!!!!!!!!!!!!!!!!
                  // Aby tam vznikl nový film s ID=6 (nebo jiné ID dle situace) a tento film se přiřadil k hercům starším 30let.
                  // Pak metodu addMovieAndItsActors zakomentovat a pustit samostatně tuto metodu selectJoinAndDelete,
                  // kde uvedu správné ID toho nového filmu do  "WHERE movieAlias.id = 6".
-        selectJoinAndDelete(session);
+        // selectJoinAndDelete(session);
         //**************************************************************************************************
 
         // ******************** CRITERIA QUERY = CR API *************************************************************
-        //CrApiTestClass crapi = new CrApiTestClass(session);
-        //crapi.runItWithWhere("%J%", 28);
+        // CrApiTestClass crapi = new CrApiTestClass(session);
+        // Pokud není žádný WHERE výraz(tj. nevznikly žádné Predikáty), tak udělá obyčejný SELECT- tj. to co je v
+        // metodě za ELSE v tom IF: criteriaQuery.select(root). Tj. vypíšou se všichni herci a jejich věk.
+        // crapi.runItWithWhere(null, null);
+
+        // Zde ukázka použití zástupních (regulárních) znaků pro definici regulárního výrazu, které se používají
+        // např. v příkazu LIKE uvnitř WHERE.  Selektuji herce, kteří mají ve jméně J.
+        // crapi.runItWithWhere("%J%", null);
+
+        // Tento výraz vrátí herce, kteří mají ve jméně J a zároveň jsou STARŠÍ NEŽ 28LET
+        // crapi.runItWithWhere("%J%", 28);
+
         // ******************************************************************
 
         //****************JEDNODUCHÝ DELETE ***********************************************************
