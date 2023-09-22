@@ -81,7 +81,7 @@ public class AppMain {
         // metodě za ELSE v tom IF: criteriaQuery.select(root). Tj. vypíšou se všichni herci a jejich věk.
         // crapi.runItWithWhere(null, null);
 
-        // Zde ukázka použití zástupních (regulárních) znaků pro definici regulárního výrazu, které se používají
+        // Zde ukázka použití wildcard characters (znaků) pro definici regulárního výrazu, které se používají
         // např. v příkazu LIKE uvnitř WHERE.  Selektuji herce, kteří mají ve jméně J.
         // crapi.runItWithWhere("%J%", null);
 
